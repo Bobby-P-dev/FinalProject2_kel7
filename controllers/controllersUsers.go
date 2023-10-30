@@ -87,9 +87,10 @@ func EditUser(c *gin.Context) {
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	contentType := helpers.GetContentType(c)
-	_, _ = db, contentType
-	User := models.Users{}
+	_ = contentType
+	id := c.Param("id")
 
+	User := models.Users{}
 	userID := uint(userData["id"].(float64))
 
 	if contentType == appJSON {
@@ -99,19 +100,22 @@ func EditUser(c *gin.Context) {
 	}
 	User.ID = userID
 
-	db.First(&User, userID)
-	result := db.Model(&User).Updates(models.Users{
+	err := db.Model(&User).Where("id = ?", id).Updates(models.Users{
 		Email: User.Email, Username: User.Username,
-	})
-	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"status": "failed to edit user"})
+	}).First(&User).Error
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  "failed to edit user",
+			"message": err.Error(),
+		})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
+		"age":       User.Age,
 		"id":        User.ID,
 		"email":     User.Email,
 		"username":  User.Username,
-		"age":       User.Age,
 		"update_at": User.UpdatedAt,
 	})
 }
@@ -125,7 +129,7 @@ func DeleteUser(c *gin.Context) {
 
 	User.ID = userID
 
-	err := db.Debug().Delete(&User).Error
+	err := db.Delete(&User).Error
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error":   "unauthorized",
@@ -135,7 +139,6 @@ func DeleteUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "200",
-		"message": "Success",
+		"message": "Your account has been  succesfully deleted",
 	})
 }

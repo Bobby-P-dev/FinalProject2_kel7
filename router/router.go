@@ -15,16 +15,33 @@ func StarApp() *gin.Engine {
 		userRouter.POST("/login", controllers.LoginUser)
 		userRouter.PUT("/edit/:id", middlewares.Authentication(), controllers.EditUser)
 		userRouter.DELETE("/delete", middlewares.Authentication(), controllers.DeleteUser)
-
 	}
 
 	photoRouter := r.Group("/photo")
 	{
 		photoRouter.Use(middlewares.Authentication())
 		photoRouter.POST("/upload", controllers.UploadPhoto)
-		photoRouter.GET("/getAll", controllers.GetPhoto)
-		photoRouter.PUT("/edit/:id", middlewares.UserAuthorization(), controllers.EditPhoto)
-		photoRouter.DELETE("/delete/:id", middlewares.UserAuthorization(), controllers.DeletePhoto)
+		photoRouter.GET("/get", controllers.GetPhoto)
+		photoRouter.PUT("/put/:photoId", middlewares.UserAuthorization(), controllers.EditPhoto)
+		photoRouter.DELETE("/del/:photoId", middlewares.UserAuthorization(), controllers.DeletePhoto)
+	}
+
+	commentRouter := r.Group("/comment")
+	{
+		commentRouter.Use(middlewares.Authentication())
+		commentRouter.POST("/upload", controllers.UploadComment)
+		commentRouter.GET("/get", controllers.GetComment)
+		commentRouter.PUT("/put/:commentId", middlewares.CommentAuthorization(), controllers.EditComment)
+		commentRouter.DELETE("/del/:commentId", middlewares.CommentAuthorization(), controllers.DeleteComment)
+	}
+
+	socialRouter := r.Group("/socialm")
+	{
+		socialRouter.Use(middlewares.Authentication())
+		socialRouter.POST("/upload", controllers.UploadSocialMedia)
+		socialRouter.GET("/get", controllers.GetSocialMedia)
+		socialRouter.PUT("/put/:socialId", middlewares.SocialMAuthorization(), controllers.EditSocialMedia)
+		socialRouter.DELETE("/del/:socialId", middlewares.SocialMAuthorization(), controllers.DeleteSocialMedia)
 	}
 	return r
 }
