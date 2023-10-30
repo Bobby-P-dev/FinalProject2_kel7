@@ -12,8 +12,6 @@ type Users struct {
 	Email    string `json:"email" form:"email" gorm:"uniqueIndex" gorm:"not null" validate:"required,email"` //validation
 	Password string `json:"password" gorm:"not null" validate:"required,min=6"`                              //validation
 	Age      int    `json:"age" gorm:"not null" validate:"required,numeric,min=18"`                          //validation
-	PhotoUrl string `json:"photo_url" form:"photo_url"`
-	Photo    photoResponeU
 }
 
 func (u *Users) BeforeCreate(tx *gorm.DB) (err error) {

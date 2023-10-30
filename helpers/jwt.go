@@ -9,6 +9,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+var secret = "qwerty"
+
 func GenerateToken(id uint, email string) string {
 	claims := jwt.MapClaims{
 		"id":    id,
@@ -16,9 +18,7 @@ func GenerateToken(id uint, email string) string {
 	}
 	parseToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	key := os.Getenv("KEY")
-
-	signedToken, _ := parseToken.SignedString([]byte(key))
+	signedToken, _ := parseToken.SignedString([]byte(secret))
 	return signedToken
 }
 
