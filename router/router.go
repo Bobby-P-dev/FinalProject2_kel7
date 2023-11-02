@@ -43,5 +43,6 @@ func StarApp() *gin.Engine {
 		socialRouter.PUT("/put/:socialId", middlewares.SocialMAuthorization(), controllers.EditSocialMedia)
 		socialRouter.DELETE("/del/:socialId", middlewares.SocialMAuthorization(), controllers.DeleteSocialMedia)
 	}
+
 	return r
 }
