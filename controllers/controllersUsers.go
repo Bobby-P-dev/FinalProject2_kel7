@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	appJSON = "aplication/json"
+	appJSON = "application/json"
 )
 
 func RegisterUser(c *gin.Context) {
