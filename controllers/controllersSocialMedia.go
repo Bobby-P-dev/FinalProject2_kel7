@@ -12,6 +12,7 @@ import (
 )
 
 func UploadSocialMedia(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	typeContent := helpers.GetContentType(c)
@@ -22,7 +23,8 @@ func UploadSocialMedia(c *gin.Context) {
 	if typeContent == appJSON {
 		c.ShouldBindJSON(&Social)
 	} else {
-		c.ShouldBind(&Social)
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
 	}
 
 	Social.UsersID = int(userID)
@@ -30,8 +32,8 @@ func UploadSocialMedia(c *gin.Context) {
 	err := db.Create(&Social).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "bad request",
-			"message": err.Error(),
+			"err":     err.Error(),
+			"message": "Failed to create data",
 		})
 		return
 	}
@@ -45,11 +47,13 @@ func UploadSocialMedia(c *gin.Context) {
 }
 
 func GetSocialMedia(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 
 	var Social []models.SocialMedia
 	SocialM := models.SocialMedia{}
+
 	userID := uint(userData["id"].(float64))
 
 	SocialM.UsersID = int(userID)
@@ -58,8 +62,8 @@ func GetSocialMedia(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "error",
-			"msg":   err.Error(),
+			"error": err.Error(),
+			"msg":   "Failed to get data",
 		})
 		return
 	}
@@ -69,9 +73,11 @@ func GetSocialMedia(c *gin.Context) {
 }
 
 func EditSocialMedia(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	typeContent := helpers.GetContentType(c)
+
 	Social := models.SocialMedia{}
 
 	soacialId, _ := strconv.Atoi(c.Param("socialId"))
@@ -80,7 +86,8 @@ func EditSocialMedia(c *gin.Context) {
 	if typeContent == appJSON {
 		c.ShouldBindJSON(&Social)
 	} else {
-		c.ShouldBind(&Social)
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
 	}
 
 	Social.UsersID = int(userID)
@@ -92,8 +99,8 @@ func EditSocialMedia(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Bad Request",
-			"message": err.Error(),
+			"error":   err.Error(),
+			"message": "Failed to update data",
 		})
 		return
 	}
@@ -108,6 +115,7 @@ func EditSocialMedia(c *gin.Context) {
 }
 
 func DeleteSocialMedia(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 
@@ -121,9 +129,9 @@ func DeleteSocialMedia(c *gin.Context) {
 
 	err := db.Model(&Social).Where("id = ?", soacialId).Delete(&Social).Error
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "unauthorized",
-			"message": "invalid",
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"message": "Failed to delete data",
 		})
 		return
 	}

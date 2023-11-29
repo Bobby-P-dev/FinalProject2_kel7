@@ -12,6 +12,7 @@ import (
 )
 
 func UploadPhoto(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	typeContent := helpers.GetContentType(c)
@@ -22,7 +23,8 @@ func UploadPhoto(c *gin.Context) {
 	if typeContent == appJSON {
 		c.ShouldBindJSON(&Photo)
 	} else {
-		c.ShouldBind(&Photo)
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
 	}
 
 	Photo.UsersID = int(userID)
@@ -31,8 +33,8 @@ func UploadPhoto(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "bad request",
-			"message": err.Error(),
+			"err":     err.Error(),
+			"message": "failed to created account",
 		})
 		return
 	}
@@ -46,6 +48,7 @@ func UploadPhoto(c *gin.Context) {
 }
 
 func GetPhoto(c *gin.Context) {
+
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	var Photos []models.Photo
 
@@ -58,8 +61,8 @@ func GetPhoto(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "error",
-			"msg":   err.Error(),
+			"error": err.Error(),
+			"msg":   "failed to get data",
 		})
 		return
 	}
@@ -70,9 +73,11 @@ func GetPhoto(c *gin.Context) {
 }
 
 func EditPhoto(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	typeContent := helpers.GetContentType(c)
+
 	Photo := models.Photo{}
 
 	photoId, _ := strconv.Atoi(c.Param("photoId"))
@@ -81,7 +86,8 @@ func EditPhoto(c *gin.Context) {
 	if typeContent == appJSON {
 		c.ShouldBindJSON(&Photo)
 	} else {
-		c.ShouldBind(&Photo)
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
 	}
 
 	Photo.UsersID = int(userID)
@@ -93,8 +99,8 @@ func EditPhoto(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Bad Request",
-			"message": err.Error(),
+			"error":   err.Error(),
+			"message": "failed to update photo",
 		})
 		return
 	}
@@ -109,6 +115,7 @@ func EditPhoto(c *gin.Context) {
 }
 
 func DeletePhoto(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 
@@ -122,9 +129,9 @@ func DeletePhoto(c *gin.Context) {
 
 	err := db.Model(&Photo).Where("id = ?", photoId).Delete(&Photo).Error
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "unauthorized",
-			"message": "invalid",
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"message": "invalid to delete photo",
 		})
 		return
 	}

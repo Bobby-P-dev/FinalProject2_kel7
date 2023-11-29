@@ -27,6 +27,13 @@ func (u *Users) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+func (u *Users) BeforeUpdate(tx *gorm.DB) (err error) {
+	if err := validator.New().StructExcept(u, "Password", "Age"); err != nil {
+		return err
+	}
+	return nil
+}
+
 type UsersRespon struct {
 	ID       int    `json:"id" form:"id"`
 	Username string `json:"username" form:"username" `
@@ -40,7 +47,6 @@ func (UsersRespon) TableName() string {
 type UsersResponSocial struct {
 	ID       int    `json:"id" form:"users_id"`
 	Username string `json:"username" form:"username"`
-	PhotoUrl string `json:"profile_image_url" form:"photo_url"`
 }
 
 func (UsersResponSocial) TableName() string {

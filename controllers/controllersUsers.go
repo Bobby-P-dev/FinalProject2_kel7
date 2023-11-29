@@ -15,22 +15,24 @@ var (
 )
 
 func RegisterUser(c *gin.Context) {
+
 	db := database.GetDB()
 	contentType := helpers.GetContentType(c)
-	_, _ = db, contentType
 	User := models.Users{}
 
 	if contentType == appJSON {
 		c.ShouldBindJSON(&User)
 	} else {
-		c.ShouldBind(&User)
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
 	}
-	err := db.Debug().Create(&User).Error
+
+	err := db.Create(&User).Error
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "bad request",
-			"message": err.Error(),
+			"error":   err.Error(),
+			"message": "Invalid to created account",
 		})
 		return
 	}
@@ -44,35 +46,37 @@ func RegisterUser(c *gin.Context) {
 }
 
 func LoginUser(c *gin.Context) {
+
 	db := database.GetDB()
 	contentType := helpers.GetContentType(c)
-	_, _ = db, contentType
+
 	User := models.Users{}
 	password := ""
 
 	if contentType == appJSON {
 		c.ShouldBindJSON(&User)
 	} else {
-		c.ShouldBind(&User)
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
 	}
 
 	password = User.Password
 
-	err := db.Debug().Where("email = ?", User.Email).Take(&User).Error
+	err := db.Where("email = ?", User.Email).Take(&User).Error
 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unauthorized",
-			"message": "invalid email/password",
+		c.JSON(http.StatusNotFound, gin.H{
+			"error":   err.Error(),
+			"message": "invalid email",
 		})
 		return
 	}
 	comparePass := helpers.ComparePass([]byte(User.Password), []byte(password))
 
 	if !comparePass {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unauthorized",
-			"message": "invalid email/password",
+		c.JSON(http.StatusNotFound, gin.H{
+			"error":   err.Error(),
+			"message": "invalid password",
 		})
 		return
 	}
@@ -84,20 +88,24 @@ func LoginUser(c *gin.Context) {
 }
 
 func EditUser(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	contentType := helpers.GetContentType(c)
-	_ = contentType
+
 	id := c.Param("id")
 
 	User := models.Users{}
+
 	userID := uint(userData["id"].(float64))
 
 	if contentType == appJSON {
 		c.ShouldBindJSON(&User)
 	} else {
-		c.ShouldBind(&User)
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
 	}
+
 	User.ID = userID
 
 	err := db.Model(&User).Where("id = ?", id).Updates(models.Users{
@@ -106,8 +114,8 @@ func EditUser(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "failed to edit user",
-			"message": err.Error(),
+			"status":  err.Error(),
+			"message": "failed to edit user",
 		})
 		return
 	}
@@ -121,6 +129,7 @@ func EditUser(c *gin.Context) {
 }
 
 func DeleteUser(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	User := models.Users{}
@@ -130,10 +139,11 @@ func DeleteUser(c *gin.Context) {
 	User.ID = userID
 
 	err := db.Delete(&User).Error
+
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "unauthorized",
-			"message": "invalid",
+			"error":   err.Error(),
+			"message": "invalid Delete Data",
 		})
 		return
 	}

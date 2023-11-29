@@ -12,6 +12,7 @@ import (
 )
 
 func UploadComment(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	typeContent := helpers.GetContentType(c)
@@ -22,7 +23,8 @@ func UploadComment(c *gin.Context) {
 	if typeContent == appJSON {
 		c.ShouldBindJSON(&Comment)
 	} else {
-		c.ShouldBind(&Comment)
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
 	}
 
 	Comment.UsersID = int(userID)
@@ -30,8 +32,8 @@ func UploadComment(c *gin.Context) {
 	err := db.Create(&Comment).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "bad request",
-			"message": err.Error(),
+			"err":     err.Error(),
+			"message": "Failed to creat comment",
 		})
 		return
 	}
@@ -45,6 +47,7 @@ func UploadComment(c *gin.Context) {
 }
 
 func GetComment(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	var Comment []models.Comment
@@ -53,12 +56,13 @@ func GetComment(c *gin.Context) {
 	userID := uint(userData["id"].(float64))
 
 	Comments.UsersID = int(userID)
+
 	err := db.Preload("Users").Preload("Photo").Find(&Comment, Comments).Error
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "error",
-			"msg":   err.Error(),
+			"error": err.Error(),
+			"msg":   "Failed to get data",
 		})
 		return
 	}
@@ -68,6 +72,7 @@ func GetComment(c *gin.Context) {
 }
 
 func EditComment(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	typeContent := helpers.GetContentType(c)
@@ -80,7 +85,8 @@ func EditComment(c *gin.Context) {
 	if typeContent == appJSON {
 		c.ShouldBindJSON(&Comments)
 	} else {
-		c.ShouldBind(&Comments)
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
 	}
 
 	Comments.UsersID = int(userID)
@@ -92,8 +98,8 @@ func EditComment(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Bad Request",
-			"message": err.Error(),
+			"error":   err.Error(),
+			"message": "Failed to update comment",
 		})
 		return
 	}
@@ -110,6 +116,7 @@ func EditComment(c *gin.Context) {
 }
 
 func DeleteComment(c *gin.Context) {
+
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 
@@ -123,9 +130,9 @@ func DeleteComment(c *gin.Context) {
 
 	err := db.Model(&Comments).Where("id = ?", commentId).Delete(&Comments).Error
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "unauthorized",
-			"message": "invalid",
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"message": "Failed to delete comment",
 		})
 		return
 	}
