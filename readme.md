@@ -53,6 +53,7 @@ request body
 Method = PUT
 
 Domain = https://finalproject2kel7.adaptable.app/users/edit/id
+
 request
 `
 bearer token authorization & param id
@@ -113,6 +114,7 @@ bearer token authorization
 Method = PUT
 
 Domain = https://finalproject2kel7.adaptable.app/users/edit/id
+
 request
 `
 bearer token authorization & param id
@@ -131,6 +133,7 @@ request body
 Method = DELETE
 
 Domain = https://finalproject2kel7.adaptable.app/photo/del/id
+
 request
 `
 bearer token authorization & param id
@@ -173,6 +176,7 @@ bearer token authorization
 Method = PUT
 
 Domain = https://finalproject2kel7.adaptable.app/comment/put/id
+
 request
 `
 bearer token authorization & param id
@@ -203,6 +207,7 @@ bearer token authorization & param id
 Method = POST
 
 Domain = https://finalproject2kel7.adaptable.app/socialm/upload
+
 request
 `
 bearer token authorization
@@ -220,6 +225,7 @@ request body
 Method = GET
 
 Domain = https://finalproject2kel7.adaptable.app/socialm/get
+
 request
 `
 bearer token authorization
