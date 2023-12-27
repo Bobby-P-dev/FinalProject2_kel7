@@ -1,4 +1,3 @@
-FP2
 package controllers
 
 import (
