@@ -12,7 +12,6 @@ import (
 )
 
 func UploadPhoto(c *gin.Context) {
-
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	typeContent := helpers.GetContentType(c)
@@ -23,8 +22,7 @@ func UploadPhoto(c *gin.Context) {
 	if typeContent == appJSON {
 		c.ShouldBindJSON(&Photo)
 	} else {
-		c.AbortWithStatus(http.StatusUnprocessableEntity)
-		return
+		c.ShouldBind(&Photo)
 	}
 
 	Photo.UsersID = int(userID)
@@ -33,22 +31,22 @@ func UploadPhoto(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     err.Error(),
-			"message": "failed to created account",
+			"err"     :     "bad request",
+			"message" : err.Error(),
 		})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{
-		"id":         Photo.ID,
-		"tilte":      Photo.Title,
-		"caption":    Photo.Caption,
-		"user_id":    Photo.UsersID,
-		"created_at": Photo.CreatedAt,
+		"id"        :        Photo.ID,
+		"tilte"     :     Photo.Title,
+		"caption"   :   Photo.Caption,
+		"photo_url" : Photo.PhotoUrl,
+		"user_id"   :   Photo.UsersID,
+		"update_at" : Photo.UpdatedAt,
 	})
 }
 
 func GetPhoto(c *gin.Context) {
-
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	var Photos []models.Photo
 
@@ -61,8 +59,8 @@ func GetPhoto(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-			"msg":   "failed to get data",
+			"error" : "error",
+			"msg"   :   err.Error(),
 		})
 		return
 	}
@@ -73,11 +71,9 @@ func GetPhoto(c *gin.Context) {
 }
 
 func EditPhoto(c *gin.Context) {
-
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	typeContent := helpers.GetContentType(c)
-
 	Photo := models.Photo{}
 
 	photoId, _ := strconv.Atoi(c.Param("photoId"))
@@ -86,8 +82,7 @@ func EditPhoto(c *gin.Context) {
 	if typeContent == appJSON {
 		c.ShouldBindJSON(&Photo)
 	} else {
-		c.AbortWithStatus(http.StatusUnprocessableEntity)
-		return
+		c.ShouldBind(&Photo)
 	}
 
 	Photo.UsersID = int(userID)
@@ -99,23 +94,22 @@ func EditPhoto(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   err.Error(),
-			"message": "failed to update photo",
+			"error"    : "Bad Request",
+			"message"  : err.Error(),
 		})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"id":        Photo.ID,
-		"tilte":     Photo.Title,
-		"caption":   Photo.Caption,
-		"photo_url": Photo.PhotoUrl,
-		"user_id":   Photo.UsersID,
-		"update_at": Photo.UpdatedAt,
+		"id"        :        Photo.ID,
+		"tilte"     :     Photo.Title,
+		"caption"   :   Photo.Caption,
+		"photo_url" : Photo.PhotoUrl,
+		"user_id"   :   Photo.UsersID,
+		"update_at" : Photo.UpdatedAt,
 	})
 }
 
 func DeletePhoto(c *gin.Context) {
-
 	db := database.GetDB()
 	userData := c.MustGet("userData").(jwt.MapClaims)
 
@@ -129,9 +123,9 @@ func DeletePhoto(c *gin.Context) {
 
 	err := db.Model(&Photo).Where("id = ?", photoId).Delete(&Photo).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   err.Error(),
-			"message": "invalid to delete photo",
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error"   :   "unauthorized",
+			"message" : "invalid",
 		})
 		return
 	}
