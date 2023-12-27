@@ -1,3 +1,4 @@
+FP2
 package controllers
 
 import (
@@ -31,17 +32,18 @@ func UploadPhoto(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "bad request",
-			"message": err.Error(),
+			"err"     :     "bad request",
+			"message" : err.Error(),
 		})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{
-		"id":         Photo.ID,
-		"tilte":      Photo.Title,
-		"caption":    Photo.Caption,
-		"user_id":    Photo.UsersID,
-		"created_at": Photo.CreatedAt,
+		"id"        :        Photo.ID,
+		"tilte"     :     Photo.Title,
+		"caption"   :   Photo.Caption,
+		"photo_url" : Photo.PhotoUrl,
+		"user_id"   :   Photo.UsersID,
+		"update_at" : Photo.UpdatedAt,
 	})
 }
 
@@ -58,8 +60,8 @@ func GetPhoto(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "error",
-			"msg":   err.Error(),
+			"error" : "error",
+			"msg"   :   err.Error(),
 		})
 		return
 	}
@@ -93,18 +95,18 @@ func EditPhoto(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Bad Request",
-			"message": err.Error(),
+			"error"    : "Bad Request",
+			"message"  : err.Error(),
 		})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"id":        Photo.ID,
-		"tilte":     Photo.Title,
-		"caption":   Photo.Caption,
-		"photo_url": Photo.PhotoUrl,
-		"user_id":   Photo.UsersID,
-		"update_at": Photo.UpdatedAt,
+		"id"        :        Photo.ID,
+		"tilte"     :     Photo.Title,
+		"caption"   :   Photo.Caption,
+		"photo_url" : Photo.PhotoUrl,
+		"user_id"   :   Photo.UsersID,
+		"update_at" : Photo.UpdatedAt,
 	})
 }
 
@@ -123,8 +125,8 @@ func DeletePhoto(c *gin.Context) {
 	err := db.Model(&Photo).Where("id = ?", photoId).Delete(&Photo).Error
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "unauthorized",
-			"message": "invalid",
+			"error"   :   "unauthorized",
+			"message" : "invalid",
 		})
 		return
 	}
