@@ -29,16 +29,16 @@ func RegisterUser(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "bad request",
-			"message": err.Error(),
+			"error"    : "bad request",
+			"message"  : err.Error(),
 		})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{
-		"id":       User.ID,
-		"email":    User.Email,
-		"username": User.Username,
-		"age":      User.Age,
+		"id"       : User.ID,
+		"email"    : User.Email,
+		"username" : User.Username,
+		"age"      : User.Age,
 	})
 
 }
@@ -62,8 +62,8 @@ func LoginUser(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unauthorized",
-			"message": "invalid email/password",
+			"error"   : "Unauthorized",
+			"message" : "invalid email/password",
 		})
 		return
 	}
@@ -71,8 +71,8 @@ func LoginUser(c *gin.Context) {
 
 	if !comparePass {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "Unauthorized",
-			"message": "invalid email/password",
+			"error"    : "Unauthorized",
+			"message"  : "invalid email/password",
 		})
 		return
 	}
@@ -106,17 +106,17 @@ func EditUser(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "failed to edit user",
-			"message": err.Error(),
+			"status"   : "failed to edit user",
+			"message"  : err.Error(),
 		})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"age":       User.Age,
-		"id":        User.ID,
-		"email":     User.Email,
-		"username":  User.Username,
-		"update_at": User.UpdatedAt,
+		"age"        : User.Age,
+		"id"         : User.ID,
+		"email"      : User.Email,
+		"username"   : User.Username,
+		"update_at"  : User.UpdatedAt,
 	})
 }
 
@@ -132,8 +132,8 @@ func DeleteUser(c *gin.Context) {
 	err := db.Delete(&User).Error
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "unauthorized",
-			"message": "invalid",
+			"error"    : "unauthorized",
+			"message"  : "invalid",
 		})
 		return
 	}
